@@ -1,49 +1,44 @@
-# from openai import OpenAI
 from pathlib import Path
-import json 
 
-# client = OpenAI()
-
-# 1. Define a list of callable tools for the model
 tools = [
     {
-        "type" : "function",
-        "name" : "list_files",
-        "description" : "List the files in the given directory.",
-        "parameters" : {
-            "type" : "object",
-            "properties" : {
-                "path" : {
-                    "type" : "string",
-                    "description" : "A path to the desired directory where the files are.",
+        "type": "function",
+        "name": "list_files",
+        "description": "List the files in the given directory.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "path": {
+                    "type": "string",
+                    "description": "A path to the desired directory where the files are.",
                 },
             },
-            "required" : ["path"],
-            "additionalProperties" : False # tells the models not to invent extra arguments
+            "required": ["path"],
+            "additionalProperties": False,
         },
-        "strict" : True, # it makes the model follow the schema exactly
+        "strict": True,
     },
-
     {
-        "type" : "function",
-        "name" : "read_file",
-        "description" : "Read the content of given file.",
-        "parameters" : {
-            "type" : "object",
-            "properties" : {
-                "path" : {
-                    "type" : "string",
-                    "description" : "Will read a file and show its content"
+        "type": "function",
+        "name": "read_file",
+        "description": "Read the content of the given file.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "path": {
+                    "type": "string",
+                    "description": "Path to the file to read.",
                 },
             },
-            "required" : ["path"],
-            "additionalProperties" : False
+            "required": ["path"],
+            "additionalProperties": False,
         },
-        "strict" : True,
-    }
+        "strict": True,
+    },
 ]
 
-def list_files(path: str) -> list[str]:
+
+def list_files(path: str) -> str:
     try:
         p = Path(path)
         files = [x.name for x in p.iterdir() if x.is_file()]
@@ -55,20 +50,21 @@ def list_files(path: str) -> list[str]:
     if not files:
         return f"No files found in {path}"
     return "\n".join(sorted(files))
-    
 
-def read_file(file_path:str) -> str:
+
+def read_file(path: str) -> str:
     try:
-        p = Path(file_path)
-        if p.is_file():
-            file = open(p, "r")
-            content = file.read()
-            return content
+        return Path(path).read_text()
     except FileNotFoundError:
-        return f"Error: file not found: {file_path}"
+        return f"Error: file not found: {path}"
+    except IsADirectoryError:
+        return f"Error: not a file: {path}"
+    except (PermissionError, UnicodeDecodeError) as e:
+        return f"Error: cannot read {path}: {e}"
 
 
 if __name__ == "__main__":
-
     print(list_files("."))
     print(read_file("./tools.py"))
+    print(read_file("nope.txt"))
+    print(read_file("."))
