@@ -26,11 +26,19 @@ tools = [
 ]
 
 def list_files(path: str) -> list[str]:
-    p = Path(path)
-    return [x.name for x in p.iterdir() if x.is_file()]
+    try:
+        p = Path(path)
+        files = [x.name for x in p.iterdir() if x.is_file()]
+    except FileNotFoundError:
+        return f"Error: directory not found: {path}"
+    except NotADirectoryError:
+        return f"Error: not a directory: {path}"
+
+    if not files:
+        return f"No files found in {path}"
+    return "\n".join(sorted(files))
+    
+
+    
 
 
-if __name__ == "__main__":
-
-    file_path = Path(".")
-    print(list_files(file_path))
