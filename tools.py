@@ -22,6 +22,24 @@ tools = [
             "additionalProperties" : False # tells the models not to invent extra arguments
         },
         "strict" : True, # it makes the model follow the schema exactly
+    },
+
+    {
+        "type" : "function",
+        "name" : "read_file",
+        "description" : "Read the content of given file.",
+        "parameters" : {
+            "type" : "object",
+            "properties" : {
+                "path" : {
+                    "type" : "string",
+                    "description" : "Will read a file and show its content"
+                },
+            },
+            "required" : ["path"],
+            "additionalProperties" : False
+        },
+        "strict" : True,
     }
 ]
 
