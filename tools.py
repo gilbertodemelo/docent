@@ -57,6 +57,18 @@ def list_files(path: str) -> list[str]:
     return "\n".join(sorted(files))
     
 
-    
+def read_file(file_path:str) -> str:
+    try:
+        p = Path(file_path)
+        if p.is_file():
+            file = open(p, "r")
+            content = file.read()
+            return content
+    except FileNotFoundError:
+        return f"Error: file not found: {file_path}"
 
 
+if __name__ == "__main__":
+
+    print(list_files("."))
+    print(read_file("./tools.py"))
